@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>省份水质数据统计</title>
+    <style>
+        /* 设置全局样式 */
+        html, body {
+            font-family: Arial, sans-serif; /* 使用Arial字体 */
+            background-color: #f4f4f4; /* 设置背景色 */
+            color: #333; /* 设置文本颜色 */
+            margin: 0; /* 清除默认的外边距 */
+            padding: 0; /* 清除默认的内边距 */
+            width: 100%; /* 设置宽度为100% */
+            overflow-x: hidden; /* 隐藏水平滚动条 */
+            display: flex; /* 使用弹性布局 */
+            flex-direction: column; /* 设置主轴方向为垂直 */
+            align-items: center; /* 在交叉轴上居中对齐 */
+            padding-top: 50px; /* 顶部填充50px */
+        }
+
+        /* 定义容器样式 */
+        .container {
+            background-color: #fff; /* 设置背景色为白色 */
+            border-radius: 8px; /* 设置边框圆角 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
+            padding: 20px; /* 设置内边距 */
+            max-width: 800px; /* 设置最大宽度 */
+            width: 100%; /* 设置宽度为100% */
+            box-sizing: border-box; /* 设置盒模型为border-box */
+            margin-bottom: 20px; /* 底部外边距为20px */
+            overflow-y: auto; /* 添加垂直滚动条 */
+            height: 100%; /* 设置容器高度为100% */
+        }
+
+        /* 定义标题样式 */
+        h2 {
+            color: #0056b3;
+            text-align: center;
+            margin-top: 0; /* 添加 */
+        }
+
+        /* 定义标签样式 */
+        label {
+            display: block; /* 设置为块级元素 */
+            margin-bottom: 8px; /* 底部外边距为8px */
+            font-weight: bold; /* 设置字体加粗 */
+        }
+
+        /* 定义下拉列表和提交按钮样式 */
+        select, input[type="datetime-local"], input[type="submit"] {
+            width: 100%; /* 设置宽度为100% */
+            padding: 8px; /* 设置内边距 */
+            margin-bottom: 16px; /* 底部外边距为16px */
+            border: 1px solid #ccc; /* 设置边框 */
+            border-radius: 4px; /* 设置边框圆角 */
+            box-sizing: border-box; /* 设置盒模型为border-box */
+        }
+
+        /* 定义提交按钮样式 */
+        input[type="submit"] {
+            background-color: #0056b3; /* 设置背景色 */
+            color: #fff; /* 设置文本颜色 */
+            padding: 10px 15px; /* 设置内边距 */
+            border: none; /* 清除边框 */
+            cursor: pointer; /* 设置鼠标指针样式为手型 */
+            font-size: 16px; /* 设置字体大小 */
+        }
+
+        /* 定义提交按钮悬停样式 */
+        input[type="submit"]:hover {
+            background-color: #004494; /* 悬停时背景色变化 */
+        }
+
+        /* 定义表格样式 */
+        table {
+            width: 100%; /* 设置宽度为100% */
+            border-collapse: collapse; /* 合并边框 */
+            margin-bottom: 20px; /* 底部外边距为20px */
+        }
+
+        /* 定义表头和表格单元格样式 */
+        th, td {
+            padding: 8px; /* 设置内边距 */
+            border: 1px solid #ccc; /* 设置边框 */
+            text-align: left; /* 设置文本左对齐 */
+        }
+
+        /* 定义表头样式 */
+        th {
+            background-color: #0056b3; /* 设置背景色 */
+            color: white; /* 设置文本颜色 */
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>按省份和时间范围进行水质数据统计</h2>
+    <form method="post" action="{% url 'statistic' %}">
+        {% csrf_token %}
+        <label for="province">选择省份:</label>
+        <select name="province_id" id="province">
+            {% for province in provinces %}
+                <option value="{{ province.province_id }}">{{ province.province_name }}</option>
+            {% endfor %}
+        </select>
+        <label for="start_date">起始日期:</label>
+        <input type="datetime-local" id="start_date" name="start_date">
+        <label for="end_date">结束日期:</label>
+        <input type="datetime-local" id="end_date" name="end_date">
+        <input type="submit" value="统计">
+    </form>
+</div>
+
+{% if water_quality_stats %}
+    <div class="container">
+        <h2>{{ province_name }} 水质数据统计结果</h2>
+        <h3>统计时间范围: {{ start_date }} 至 {{ end_date }}</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>指标</th>
+                <th>平均值</th>
+                <th>最大值</th>
+                <th>最小值</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>pH</td>
+                <td>{{ water_quality_stats.avg_pH|default:"None" }}</td>
+                <td>{{ water_quality_stats.max_pH|default:"None" }}</td>
+                <td>{{ water_quality_stats.min_pH|default:"None" }}</td>
+            </tr>
+            <tr>
+                <td>溶解氧</td>
+                <td>{{ water_quality_stats.avg_dissolved_oxygen|default:"None" }}</td>
+                <td>{{ water_quality_stats.max_dissolved_oxygen|default:"None" }}</td>
+                <td>{{ water_quality_stats.min_dissolved_oxygen|default:"None" }}</td>
+            </tr>
+            <tr>
+                <td>电导率</td>
+                <td>{{ water_quality_stats.avg_conductivity|default:"None" }}</td>
+                <td>{{ water_quality_stats.max_conductivity|default:"None" }}</td>
+                <td>{{ water_quality_stats.min_conductivity|default:"None" }}</td>
+            </tr>
+            <tr>
+                <td>浊度</td>
+                <td>{{ water_quality_stats.avg_turbidity|default:"None" }}</td>
+                <td>{{ water_quality_stats.max_turbidity|default:"None" }}</td>
+                <td>{{ water_quality_stats.min_turbidity|default:"None" }}</td>
+            </tr>
+            <tr>
+                <td>高锰酸钾指数</td>
+                <td>{{ water_quality_stats.avg_permanganate_index|default:"None" }}</td>
+                <td>{{ water_quality_stats.max_permanganate_index|default:"None" }}</td>
+                <td>{{ water_quality_stats.min_permanganate_index|default:"None" }}</td>
+            </tr>
+            <tr>
+                <td>氨氮</td>
+                <td>{{ water_quality_stats.avg_ammonia_nitrogen|default:"None" }}</td>
+                <td>{{ water_quality_stats.max_ammonia_nitrogen|default:"None" }}</td>
+                <td>{{ water_quality_stats.min_ammonia_nitrogen|default:"None" }}</td>
+            </tr>
+            <tr>
+                <td>总磷</td>
+                <td>{{ water_quality_stats.avg_total_phosphorus|default:"None" }}</td>
+                <td>{{ water_quality_stats.max_total_phosphorus|default:"None" }}</td>
+                <td>{{ water_quality_stats.min_total_phosphorus|default:"None" }}</td>
+            </tr>
+            <tr>
+                <td>总氮</td>
+                <td>{{ water_quality_stats.avg_total_nitrogen|default:"None" }}</td>
+                <td>{{ water_quality_stats.max_total_nitrogen|default:"None" }}</td>
+                <td>{{ water_quality_stats.min_total_nitrogen|default:"None" }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+{% endif %}
+
+</body>
+</html>

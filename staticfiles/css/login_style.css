@@ -1,0 +1,57 @@
+/*设置整个页面的背景图片*/
+body {
+    background-image: url("../../static/img/3.jpg");
+    background-size: cover;/* 背景图片填充整个页面，以cover方式展示 */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;/* 背景图片在页面滚动时固定不动 */
+    font-family: Arial, sans-serif;/* 设置字体和备用字体 */
+}
+/*通过div的id属性对登录表单进行样式设置*/
+#login {
+    background-color: rgba(255, 255, 255, 0.7);/*设置颜色和透明度*/
+    width: 300px;
+    padding: 20px;/*设置登录表单的内边距*/
+    margin: 100px auto auto;/*将登录表单沿水平方向居中显示*/
+    border-radius: 10px;/*设置登录表单的边框圆角*/
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);/*设置登录表单的阴影效果*/
+    text-align: center;/*设置登录表单内的文本居中显示*/
+}
+
+input[type="text"],
+input[type="password"] {
+    padding: 10px;/*设置输入框的内边距*/
+    border-radius: 5px;
+    border: none;/*设置输入框的边框样式为无*/
+    width: 80%;
+    margin-bottom: 20px;
+}
+
+input[type="submit"] {
+    background-color: #4286f4;/*按钮背景色*/
+    color: #fff;/*按钮文字颜色*/
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.3s ease;/*鼠标悬停时的过渡效果*/
+}
+
+input[type="submit"]:hover {
+    background-color: #3472d4;
+}
+
+#register {
+    color: #4286f4;
+    font-size: 12px;
+    margin-top: 10px;
+    text-align: right;
+    cursor: pointer;/*设置鼠标指针在悬停时的样式为手型*/
+    text-decoration: underline;
+}
+
+#register a {
+    color: #4286f4;
+    text-decoration: none;
+}

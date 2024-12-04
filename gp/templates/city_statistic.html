@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>按城市统计水质类型占比</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* 设置全局样式 */
+        html, body {
+            font-family: Arial, sans-serif; /* 使用Arial字体 */
+            background-color: #f4f4f4; /* 设置背景色 */
+            color: #333; /* 设置文本颜色 */
+            margin: 0; /* 清除默认的外边距 */
+            padding: 0; /* 清除默认的内边距 */
+            width: 100%; /* 设置宽度为100% */
+            overflow-x: hidden; /* 隐藏水平滚动条 */
+            display: flex; /* 使用弹性布局 */
+            flex-direction: column; /* 设置主轴方向为垂直 */
+            align-items: center; /* 在交叉轴上居中对齐 */
+            padding-top: 50px; /* 顶部填充50px */
+        }
+
+        /* 定义容器样式 */
+        .container {
+            background-color: #fff; /* 设置背景色为白色 */
+            border-radius: 8px; /* 设置边框圆角 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
+            padding: 20px; /* 设置内边距 */
+            max-width: 800px; /* 设置最大宽度 */
+            width: 100%; /* 设置宽度为100% */
+            box-sizing: border-box; /* 设置盒模型为border-box */
+            margin-bottom: 20px; /* 底部外边距为20px */
+            overflow-y: auto; /* 添加垂直滚动条 */
+            height: 100%; /* 设置容器高度为100% */
+        }
+
+        /* 定义标题样式 */
+        h2 {
+            color: #0056b3;
+            text-align: center;
+            margin-top: 0; /* 添加 */
+        }
+
+        /* 定义标签样式 */
+        label {
+            display: block; /* 设置为块级元素 */
+            margin-bottom: 8px; /* 底部外边距为8px */
+            font-weight: bold; /* 设置字体加粗 */
+        }
+
+        /* 定义下拉列表和提交按钮样式 */
+        select, input[type="submit"] {
+            width: 100%; /* 设置宽度为100% */
+            padding: 8px; /* 设置内边距 */
+            margin-bottom: 16px; /* 底部外边距为16px */
+            border: 1px solid #ccc; /* 设置边框 */
+            border-radius: 4px; /* 设置边框圆角 */
+        }
+
+        /* 定义提交按钮样式 */
+        input[type="submit"] {
+            background-color: #0056b3; /* 设置背景色 */
+            color: #fff; /* 设置文本颜色 */
+            padding: 10px 15px; /* 设置内边距 */
+            border: none; /* 清除边框 */
+            cursor: pointer; /* 设置鼠标指针样式为手型 */
+            font-size: 16px; /* 设置字体大小 */
+        }
+
+        /* 定义提交按钮悬停样式 */
+        input[type="submit"]:hover {
+            background-color: #004494; /* 悬停时背景色变化 */
+        }
+
+        /* 定义表格样式 */
+        table {
+            width: 100%; /* 设置宽度为100% */
+            border-collapse: collapse; /* 合并边框 */
+            margin-bottom: 20px; /* 底部外边距为20px */
+        }
+
+        /* 定义表头和表格单元格样式 */
+        th, td {
+            padding: 8px; /* 设置内边距 */
+            border: 1px solid #ccc; /* 设置边框 */
+            text-align: left; /* 设置文本左对齐 */
+        }
+
+        /* 定义表头样式 */
+        th {
+            background-color: #0056b3; /* 设置背景色 */
+            color: white; /* 设置文本颜色 */
+        }
+
+        /* 定义图表容器样式 */
+        .chart-container {
+            background-color: #fff; /* 设置背景色 */
+            border-radius: 8px; /* 设置边框圆角 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
+            padding: 20px; /* 设置内边距 */
+            max-width: 800px; /* 设置最大宽度 */
+            width: 100%; /* 设置宽度为100% */
+            box-sizing: border-box; /* 设置盒模型为border-box */
+        }
+
+        /* 定义画布样式 */
+        canvas {
+            max-width: 100%; /* 设置最大宽度为100% */
+            height: auto; /* 设置高度自适应 */
+        }
+    </style>
+
+    <script>
+        function loadCitiesByProvince() {
+            var provinceId = document.getElementById('province').value;
+
+            axios.post('/gp/get_cities_by_province/', {province_id: provinceId})
+                .then(function (response) {
+                    var citySelect = document.getElementById('city');
+                    citySelect.innerHTML = '';
+                    var cities = response.data.cities;
+                    cities.forEach(function (city) {
+                        var option = document.createElement('option');
+                        option.value = city.city_id;
+                        option.text = city.city_name;
+                        citySelect.appendChild(option);
+                    });
+                })
+                .catch(function (error) {
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <h2>按城市统计水质类型占比</h2>
+    <form method="post" action="{% url 'city_statistic' %}">
+        {% csrf_token %}
+        <label for="province">选择省份:</label>
+        <select name="province_id" id="province" onchange="loadCitiesByProvince()">
+            <option value="" disabled selected>请选择省份...</option>
+            {% for province in provinces %}
+                <option value="{{ province.province_id }}">{{ province.province_name }}</option>
+            {% endfor %}
+        </select>
+        <label for="city">选择城市:</label>
+        <select name="city_id" id="city">
+            <option value="" disabled selected>请选择城市...</option>
+        </select>
+        <input type="submit" value="统计">
+    </form>
+</div>
+
+{% if labels and counts %}
+    <div class="container">
+        <h2>水质类型占比数据详情</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>水质类型</th>
+                <th>数量</th>
+                <th>百分比</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for label, count, percentage in combined_list %}
+                <tr>
+                    <td>{{ label }}</td>
+                    <td>{{ count }}</td>
+                    <td>{{ percentage }}%</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="container chart-container">
+        <h2>{{ selected_province }} - {{ selected_city }} 水质类型占比结果</h2>
+        <div id="pieChartContainer">
+            <canvas id="pieChart"></canvas>
+        </div>
+        <script>
+            var ctx = document.getElementById('pieChart').getContext('2d');
+            var myPieChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: {{ labels|safe }},
+                    datasets: [{
+                        label: '水质类型占比',
+                        data: {{ counts|safe }},
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    tooltips: {
+                        callbacks: {
+                            label: function (tooltipItem, data) {
+                                var dataset = data.datasets[tooltipItem.datasetIndex];
+                                var total = dataset.data.reduce(function (previousValue, currentValue) {
+                                    return previousValue + currentValue;
+                                });
+                                var currentValue = dataset.data[tooltipItem.index];
+                                var percentage = Math.floor(((currentValue / total) * 100) + 0.5);
+                                return percentage + "%";
+                            }
+                        }
+                    },
+                    legend: {
+                        position: 'right'
+                    }
+                }
+            });
+        </script>
+    </div>
+{% endif %}
+
+</body>
+</html>

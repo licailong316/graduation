@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Crawler Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #0056b3;
+            color: white;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .pagination {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .pagination a {
+            display: inline-block;
+            padding: 8px 16px;
+            text-decoration: none;
+            color: #000;
+            border: 1px solid #ccc;
+            margin: 0 4px;
+        }
+
+        .pagination a.active {
+            background-color: #4CAF50;
+            color: white;
+            border: 1px solid #4CAF50;
+        }
+
+        .pagination a:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+<h1>本次爬取数据</h1>
+<table>
+    <thead>
+    <tr>
+        <th>省份</th>
+        <th>城市</th>
+        <th>流域</th>
+        <th>河流</th>
+        <th>断面名称</th>
+        <th>检测时间</th>
+        <th>水质类别</th>
+        <th>水温</th>
+        <th>pH</th>
+        <th>溶解氧</th>
+        <th>电导率</th>
+        <th>浊度</th>
+        <th>高锰酸钾指数</th>
+        <th>氨氮</th>
+        <th>总磷</th>
+        <th>总氮</th>
+        <th>叶绿素</th>
+        <th>藻密度</th>
+        <th>站点情况</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for data_row in page_obj %}
+        <tr>
+            {% for item in data_row %}
+                <td>{{ item }}</td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% if page_obj.has_other_pages %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; First</a>
+            <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% endif %}
+        {% for num in page_obj.paginator.page_range %}
+            <a {% if num == page_obj.number %}class="active"{% endif %} href="?page={{ num }}">{{ num }}</a>
+        {% endfor %}
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+        {% endif %}
+    </div>
+{% endif %}
+</body>
+</html>

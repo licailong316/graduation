@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>数据导出</title>
+    <style>
+        html, body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden; /* Ensure no scrollbars appear */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 50px; /* Add padding to top to move the content down */
+        }
+        .export-options {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 400px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        h2 {
+            margin-top: 0;
+            color: #0056b3;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #0056b3;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #004494;
+        }
+    </style>
+</head>
+<body>
+<div id="section" class="export-options">
+    <h2>按断面范围导出</h2>
+    <form method="post" action="/gp/section_export/">
+        {% csrf_token %}
+        <label for="sectionSelect">选择断面：</label>
+        <select id="sectionSelect" name="section_id">
+            {% for section in sections %}
+                <option value="{{ section.section_id }}">{{ section.section_name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">导出数据</button>
+    </form>
+</div>
+</body>
+</html>
